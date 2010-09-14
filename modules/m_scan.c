@@ -205,7 +205,7 @@ scan_umodes(struct Client *client_p, struct Client *source_p, int parc,
 		else
 		{
 			sendto_one(source_p, form_str(ERR_NOPRIVS),
-				   me.name, source_p->name, "oper_spy");
+				   me.name, source_p->name, "auspex");
 			return -1;
 		}
 	}
