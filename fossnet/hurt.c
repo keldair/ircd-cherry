@@ -17,6 +17,7 @@
 #include "s_conf.h"
 #include "s_newconf.h"
 #include "hash.h"
+#include "chmode.h"
 
 /* {{{ Structures */
 #define HURT_CUTOFF             (10)            /* protocol messages. */
@@ -58,6 +59,8 @@ static void modfini(void);
 static void client_exit_hook(hook_data_client_exit *);
 static void new_local_user_hook(struct Client *);
 static void doing_stats_hook(hook_data_int *hdata);
+
+static void h_can_join(hook_data_channel *);
 
 static void hurt_check_event(void *);
 static void hurt_expire_event(void *);
@@ -101,6 +104,7 @@ struct Message heal_msgtab = {
 mapi_hfn_list_av1 hurt_hfnlist[] = {
 	{"client_exit",		(hookfn) client_exit_hook},
 	{"new_local_user",	(hookfn) new_local_user_hook},
+	{"can_join",		(hookfn) h_can_join },
 	{"doing_stats",		(hookfn) doing_stats_hook},
 	{NULL, 			NULL},
 };
@@ -203,7 +207,7 @@ mo_hurt(struct Client *client_p, struct Client *source_p,
 		return 0;
 	}
 	if (EmptyString(reason)) {
-		sendto_one_notice(source_p, ":Empty HURT reasons are bad for business");
+		sendto_one_notice(source_p, ":Empty HURT reasons are bad for business (the reason is not shown to users.)");
 		return 0;
 	}
 
@@ -444,6 +448,31 @@ client_exit_hook(hook_data_client_exit *data)
 }
 /* }}} */
 
+/* {{{ static void h_can_join() */
+static void
+h_can_join(hook_data_channel *data)
+{
+	s_assert(data != NULL);
+	s_assert(data->target != NULL);
+
+	struct Client *source_p = data->client;
+	struct Channel *chptr = data->chptr;
+
+	if (IsAnyDead(source_p) || !EmptyString(source_p->user->suser) ||
+			IsExemptKline(source_p))
+		return;
+
+	if (!strcmp(chptr->chname, "#help")) /* #help is exempt. */
+		return;
+
+	if (hurt_find(source_p->sockhost) || hurt_find(source_p->orighost))
+	{
+		sendto_one_numeric(source_p, 520, "%s :Cannot join channel (hurt). Please identify to services immediately, join #help, or use /stats p for assistance.", chptr->chname);
+		data->approved = ERR_CUSTOM;
+	}
+}
+/* }}} */
+
 /* {{{ static void new_local_user_hook() */
 static void
 new_local_user_hook(struct Client *source_p)
@@ -458,7 +487,7 @@ new_local_user_hook(struct Client *source_p)
 		source_p->localClient->target_last = rb_current_time() + 600;		/* don't ask --nenolod */
 		SetTGChange(source_p);
 		rb_dlinkAddAlloc(source_p, &hurt_state.hurt_clients);
-		sendto_one_notice(source_p, ":You are hurt. Please identify to services immediately, or use /stats p for assistance.");
+		sendto_one_notice(source_p, ":You are hurt. Please identify to services immediately, join #help, or use /stats p for assistance.");
 	}	
 }
 /* }}} */
