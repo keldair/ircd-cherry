@@ -1196,5 +1196,5 @@ Configuration:
 	Nickname length    : $NICKLEN
 	Topic length       : $TOPICLEN
 
-Use (g)make to compile ircd-seven, then (g)make install to install it.
+Use (g)make to compile cherryircd, then (g)make install to install it.
 "
