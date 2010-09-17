@@ -462,12 +462,12 @@ h_can_join(hook_data_channel *data)
 			IsExemptKline(source_p))
 		return;
 
-	if (!strcmp(chptr->chname, "#help")) /* #help is exempt. */
+	if (!strcmp(chptr->chname, "#hurt")) /* #hurt is exempt. */
 		return;
 
 	if (hurt_find(source_p->sockhost) || hurt_find(source_p->orighost))
 	{
-		sendto_one_numeric(source_p, 520, "%s :Cannot join channel (hurt). Please identify to services immediately, join #help, or use /stats p for assistance.", chptr->chname);
+		sendto_one_numeric(source_p, 520, "%s :Cannot join channel (hurt). Please identify to services immediately, /join #hurt, or use /stats p for assistance.", chptr->chname);
 		data->approved = ERR_CUSTOM;
 	}
 }
@@ -487,7 +487,7 @@ new_local_user_hook(struct Client *source_p)
 		source_p->localClient->target_last = rb_current_time() + 600;		/* don't ask --nenolod */
 		SetTGChange(source_p);
 		rb_dlinkAddAlloc(source_p, &hurt_state.hurt_clients);
-		sendto_one_notice(source_p, ":You are hurt. Please identify to services immediately, join #help, or use /stats p for assistance.");
+		sendto_one_notice(source_p, ":You are hurt. Please identify to services immediately, /join #hurt, or use /stats p for assistance.");
 	}	
 }
 /* }}} */
