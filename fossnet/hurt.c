@@ -408,7 +408,11 @@ hurt_check_event(void *arg)
 			client_p->localClient->target_last = rb_current_time();		/* don't ask --nenolod */
 		}
 		else if (client_p->localClient->receiveM > hurt_state.cutoff)
+		{
+			sendto_one_notice(client_p, ":You have died because you failed to identify to services within the time limit.");
+			sendto_one_notice(client_p, ":To appeal this death, please email us at kline@fossnet.info.");
 			exit_client(NULL, client_p, &me, hurt_state.exit_reason);
+		}
 	}
 }
 /* }}} */
@@ -488,7 +492,7 @@ new_local_user_hook(struct Client *source_p)
 		SetTGChange(source_p);
 		rb_dlinkAddAlloc(source_p, &hurt_state.hurt_clients);
 		sendto_one_notice(source_p, ":You are hurt. Please identify to services immediately, /join #hurt, or use /stats p for assistance.");
-	}	
+	}
 }
 /* }}} */
 
