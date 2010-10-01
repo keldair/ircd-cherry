@@ -469,7 +469,7 @@ h_can_join(hook_data_channel *data)
 	if (!strcmp(chptr->chname, "#hurt")) /* #hurt is exempt. */
 		return;
 
-	if (hurt_find(source_p->sockhost) || hurt_find(source_p->orighost))
+	if (rb_dlinkFind(source_p, &hurt_state.hurt_clients))
 	{
 		sendto_one_numeric(source_p, 520, "%s :Cannot join channel (hurt). Please identify to services immediately, /join #hurt, or use /stats p for assistance.", chptr->chname);
 		data->approved = ERR_CUSTOM;
