@@ -1255,7 +1255,7 @@ exit_remote_server(struct Client *client_p, struct Client *source_p, struct Clie
 	struct Client *target_p;
 	
 	if(ConfigServerHide.flatten_links)
-		strcpy(comment1, "*.net *.split");
+		strcpy(comment1, "*.banana *.split");
 	else
 	{
 		strcpy(comment1, source_p->servptr->name);
