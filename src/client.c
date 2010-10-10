@@ -1362,7 +1362,7 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	close_connection(source_p);
 	
 	if(ConfigServerHide.flatten_links)
-		strcpy(comment1, "*.net *.split");
+		strcpy(comment1, "*.banana *.split");
 	else
 	{
 		strcpy(comment1, source_p->servptr->name);
